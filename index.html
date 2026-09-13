@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillBridge AI - Smart Career & Resume Coach</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        gemini: {
+          bg: '#131314',
+          sidebar: '#1e1f20',
+          card: '#1e1f20',
+          border: '#2d2e30',
+          input: '#1e1f20',
+          inputBorder: '#3c4043',
+          hover: '#282a2c',
+          active: '#333538',
+          accent: '#a8c7fa',
+          text: '#e3e3e3',
+          muted: '#9aa0a6'
+        }
+      }
+    }
+  }
+}
+</script>
+<!-- FontAwesome for professional icons -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- Google Fonts Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Inter', sans-serif; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+</style>
+</head>
+<body class="bg-gemini-bg text-gemini-text h-screen flex overflow-hidden antialiased">
+
+<aside id="sidebar" class="w-72 bg-gemini-sidebar flex flex-col justify-between border-r border-gemini-border transition-all duration-300 z-20 md:relative absolute h-full -translate-x-full md:translate-x-0 shadow-2xl md:shadow-none">
+  <div class="p-4 flex flex-col gap-4">
+    <div class="flex items-center gap-3 px-2 py-1">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <div>
+        <span class="font-bold text-white tracking-wide text-sm block">SkillBridge AI</span>
+        <span class="text-[11px] text-gemini-accent font-medium">Hyperbloom Hackathon</span>
+      </div>
+    </div>
+
+    <button onclick="resetApp()" class="flex items-center gap-3 bg-gemini-hover hover:bg-gemini-active text-sm font-medium px-4 py-3 rounded-full transition w-full text-left border border-transparent hover:border-gemini-inputBorder shadow-sm group">
+      <i class="fa-solid fa-plus text-gemini-accent group-hover:rotate-90 transition-transform duration-200"></i>
+      <span class="text-white">New Career Session</span>
+    </button>
+
+    <div class="mt-4 flex flex-col gap-1.5">
+      <span class="text-[11px] font-bold px-3 text-gemini-muted uppercase tracking-wider mb-1">Coach Modes</span>
+
+      <button onclick="switchMode('resume')" id="nav-resume" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium bg-[#444746] text-white transition shadow-sm">
+        <i class="fa-solid fa-file-lines text-gemini-accent w-5 text-center"></i>
+        <div class="flex flex-col text-left">
+          <span>Resume & Cover Letter</span>
+          <span class="text-[10px] text-gemini-muted font-normal">Review & polish CVs</span>
+        </div>
+      </button>
+
+      <button onclick="switchMode('interview')" id="nav-interview" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium hover:bg-gemini-hover text-gemini-muted hover:text-white transition">
+        <i class="fa-solid fa-comments text-gemini-muted w-5 text-center"></i>
+        <div class="flex flex-col text-left">
+          <span>Mock Interview Coach</span>
+          <span class="text-[10px] text-opacity-70 font-normal">Practice Q&A live</span>
+        </div>
+      </button>
+
+      <button onclick="switchMode('learning')" id="nav-learning" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium hover:bg-gemini-hover text-gemini-muted hover:text-white transition">
+        <i class="fa-solid fa-route text-gemini-muted w-5 text-center"></i>
+        <div class="flex flex-col text-left">
+          <span>Skill Learning Path</span>
+          <span class="text-[10px] text-opacity-70 font-normal">Custom roadmaps</span>
+        </div>
+      </button>
+    </div>
+  </div>
+</aside>
+
+<main class="flex-1 flex flex-col h-full bg-gemini-bg relative overflow-hidden">
+
+  <header class="h-16 border-b border-gemini-border flex items-center justify-between px-6 bg-gemini-bg z-10">
+    <div class="flex items-center gap-4">
+      <button onclick="toggleSidebar()" class="md:hidden text-gemini-text hover:text-white text-lg">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="flex flex-col">
+        <h1 id="app-title" class="text-lg font-semibold bg-gradient-to-r from-[#90caf9] via-[#b39ddb] to-[#ce93d8] bg-clip-text text-transparent">
+          Resume & Cover Letter Coach
+        </h1>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="px-3 py-1 bg-gemini-sidebar border border-gemini-border rounded-full text-xs text-gemini-accent flex items-center gap-2 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> AI Engine Active
+      </span>
+    </div>
+  </header>
+
+  <div id="chat-container" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col gap-6 max-w-4xl w-full mx-auto pb-40">
+
+    <div class="flex items-start gap-4 animate-fade-in">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 border border-blue-400/30 flex items-center justify-center text-white shrink-0 shadow-lg">
+        <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+      </div>
+      <div class="flex flex-col gap-3 bg-gemini-card border border-gemini-border p-5 rounded-3xl max-w-2xl text-sm leading-relaxed shadow-md">
+        <p class="font-semibold text-white text-base">Hello! I am your SkillBridge AI Career Coach.</p>
+        <p id="welcome-desc" class="text-gemini-muted">Share your current resume, job description, or career goals below. You can write in <strong class="text-gemini-accent">any language you prefer</strong> (English, Amharic, Afaan Oromoo, Tigrinya, etc.), and I will assist you expertly while providing professional English outputs if requested!</p>
+        <div class="flex flex-wrap gap-2 pt-2">
+          <button onclick="loadSampleData()" class="px-3 py-1.5 bg-gemini-hover hover:bg-gemini-active border border-gemini-border rounded-lg text-xs text-gemini-accent transition flex items-center gap-1.5 font-medium">
+            <i class="fa-solid fa-lightbulb"></i> Load Sample Prompt
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gemini-bg via-gemini-bg to-transparent pt-6 pb-6 px-4">
+    <div class="max-w-3xl mx-auto">
+      <form id="prompt-form" onsubmit="handleUserSubmit(event)" class="bg-gemini-input border border-gemini-inputBorder rounded-3xl p-3 flex flex-col gap-2 shadow-2xl focus-within:border-gemini-accent transition-all duration-200">
+
+        <textarea id="user-input" rows="1" placeholder="Type your prompt in any language (e.g., አማርኛ, English, Afaan Oromoo)..." class="bg-transparent text-white placeholder-gemini-muted text-sm px-3 py-2 focus:outline-none resize-none max-h-36 leading-relaxed" oninput="autoResize(this)"></textarea>
+
+        <div class="flex items-center justify-between px-2 pt-1">
+          <div class="flex items-center gap-3 text-xs text-gemini-muted">
+            <span class="flex items-center gap-1.5 text-[11px] bg-gemini-hover px-2.5 py-1 rounded-md border border-gemini-border">
+              <i class="fa-solid fa-globe text-gemini-accent"></i> Multilingual Input Supported
+            </span>
+          </div>
+          <button type="submit" id="send-btn" class="w-10 h-10 rounded-full bg-gemini-accent hover:bg-blue-200 text-[#001d35] flex items-center justify-center font-bold transition shadow-md disabled:opacity-40">
+            <i class="fa-solid fa-arrow-up text-sm"></i>
+          </button>
+        </div>
+
+      </form>
+      <div class="text-center mt-2.5 text-[11px] text-gemini-muted tracking-wide">
+        SkillBridge AI • Powered by Gemini • Built for Hackathon Excellence
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let currentMode = 'resume';
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.toggle('-translate-x-full');
+}
+
+function switchMode(mode) {
+  currentMode = mode;
+  ['resume', 'interview', 'learning'].forEach(m => {
+    const btn = document.getElementById(`nav-${m}`);
+    if (m === mode) {
+      btn.className = "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium bg-[#444746] text-white transition shadow-sm";
+    } else {
+      btn.className = "flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium hover:bg-gemini-hover text-gemini-muted hover:text-white transition";
+    }
+  });
+
+  const titleEl = document.getElementById('app-title');
+  const welcomeDesc = document.getElementById('welcome-desc');
+
+  if (mode === 'resume') {
+    titleEl.innerText = "Resume & Cover Letter Coach";
+    welcomeDesc.innerHTML = "Share your current resume or target job description below. You can write in <strong class='text-gemini-accent'>any language</strong>, and I will review your strengths, weaknesses, and format an elite professional CV/Cover Letter.";
+  } else if (mode === 'interview') {
+    titleEl.innerText = "Mock Interview Coach";
+    welcomeDesc.innerHTML = "Ready for high-stakes interview preparation! Tell me your target role in <strong class='text-gemini-accent'>any language</strong>, and I will act as an elite hiring manager conducting a live mock interview.";
+  } else if (mode === 'learning') {
+    titleEl.innerText = "Skill Learning Path Generator";
+    welcomeDesc.innerHTML = "Want to transition to a new tech stack or career? Describe your current skill level in <strong class='text-gemini-accent'>any language</strong>, and I'll generate a comprehensive week-by-week learning roadmap.";
+  }
+
+  resetApp();
+  const sidebar = document.getElementById('sidebar');
+  sidebar.classList.add('-translate-x-full');
+  const userInput = document.getElementById('user-input');
+  if (userInput) userInput.focus();
+}
+
+function resetApp() {
+  const container = document.getElementById('chat-container');
+  container.innerHTML = `<div class="flex items-start gap-4 animate-fade-in">
+    <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 border border-blue-400/30 flex items-center justify-center text-white shrink-0 shadow-lg">
+      <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+    </div>
+    <div class="flex flex-col gap-2 bg-gemini-card border border-gemini-border p-5 rounded-3xl max-w-2xl text-sm leading-relaxed shadow-md">
+      <p class="font-semibold text-white">New career session initialized. You can continue prompting in your preferred language!</p>
+    </div>
+  </div>`;
+}
+
+function autoResize(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+function loadSampleData() {
+  const input = document.getElementById('user-input');
+  if (currentMode === 'resume') {
+    input.value = "Name: Abebe Kebede\nRole: Junior Software Developer\nSkills: HTML, CSS, JavaScript, Python\nExperience: Built responsive web apps and simple automation scripts.";
+  } else if (currentMode === 'interview') {
+    input.value = "I am applying for a Senior Frontend React Developer position at a fast-growing tech startup.";
+  } else {
+    input.value = "I want to transition from manual QA testing to an AI / Machine Learning Engineer career path.";
+  }
+  autoResize(input);
+}
+
+async function handleUserSubmit(event) {
+  event.preventDefault();
+  const inputEl = document.getElementById('user-input');
+  const text = inputEl.value.trim();
+  if (!text) return;
+
+  const container = document.getElementById('chat-container');
+  container.innerHTML += `<div class="flex items-start gap-4 justify-end animate-fade-in">
+    <div class="flex flex-col gap-2 bg-[#2b2d31] border border-gemini-border p-4 rounded-3xl max-w-2xl text-sm leading-relaxed text-white shadow-md">
+      <p class="whitespace-pre-wrap">${escapeHtml(text)}</p>
+    </div>
+    <div class="w-10 h-10 rounded-2xl bg-gemini-hover border border-gemini-border flex items-center justify-center text-gemini-accent shrink-0 font-bold text-xs shadow-md">
+      YOU
+    </div>
+  </div>`;
+
+  inputEl.value = '';
+  inputEl.style.height = 'auto';
+  container.scrollTop = container.scrollHeight;
+
+  const loadingId = 'loading-' + Date.now();
+  container.innerHTML += `<div id="${loadingId}" class="flex items-start gap-4 animate-fade-in">
+    <div class="w-10 h-10 rounded-2xl bg-gemini-card border border-gemini-border flex items-center justify-center text-gemini-accent shrink-0 animate-pulse shadow-md">
+      <i class="fa-solid fa-robot"></i>
+    </div>
+    <div class="flex flex-col gap-2 bg-gemini-card border border-gemini-border p-4 rounded-3xl text-sm text-gemini-muted shadow-md">
+      <p class="flex items-center gap-2"><i class="fa-solid fa-circle-notch fa-spin text-gemini-accent"></i> SkillBridge AI is analyzing your request...</p>
+    </div>
+  </div>`;
+  container.scrollTop = container.scrollHeight;
+
+  try {
+    const aiResponse = await fetchBackendResponse(currentMode, text);
+    document.getElementById(loadingId).remove();
+
+    container.innerHTML += `<div class="flex items-start gap-4 animate-fade-in">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 border border-blue-400/30 flex items-center justify-center text-white shrink-0 shadow-lg">
+        <i class="fa-solid fa-robot"></i>
+      </div>
+      <div class="flex flex-col gap-3 bg-gemini-card border border-gemini-border p-6 rounded-3xl max-w-3xl text-sm leading-relaxed text-gemini-text shadow-xl">
+        ${formatMarkdown(aiResponse)}
+      </div>
+    </div>`;
+  } catch (err) {
+    document.getElementById(loadingId).remove();
+    container.innerHTML += `<div class="flex items-start gap-4 animate-fade-in">
+      <div class="w-10 h-10 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <div class="flex flex-col gap-2 bg-gemini-card border border-red-500/30 p-4 rounded-3xl text-sm text-red-300">
+        <p>Sorry, an error occurred while processing your request. ${escapeHtml(err.message || '')}</p>
+      </div>
+    </div>`;
+  }
+  container.scrollTop = container.scrollHeight;
+}
+
+// This now calls OUR OWN backend (/api/generate), never Google's API directly.
+// No API key is ever exposed to the browser.
+async function fetchBackendResponse(mode, promptText) {
+  const response = await fetch('/api/generate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode, prompt: promptText })
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || 'Server error');
+  }
+
+  return result.text;
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function formatMarkdown(text) {
+  let formatted = escapeHtml(text);
+  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-semibold">$1</strong>');
+  formatted = formatted.replace(/### (.*?)\n/g, '<h3 class="text-white font-bold text-base mt-3 mb-1 border-b border-gemini-border pb-1">$1</h3>');
+  formatted = formatted.replace(/- (.*?)\n/g, '<li class="ml-4 list-disc text-gemini-text my-1">$1</li>');
+  formatted = formatted.replace(/\n/g, '<br>');
+  return formatted;
+}
+</script>
+</body>
+</html>
