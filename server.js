@@ -18,7 +18,7 @@ if (!GEMINI_API_KEY) {
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 // System prompts per coach mode. Kept on the server so users can't tamper with them.
 const SYSTEM_PROMPTS = {
